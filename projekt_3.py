@@ -9,7 +9,6 @@ discord: dita8703
 # argument 1 = https://www.volby.cz/pls/ps2017nss/ps32?xjazyk=CZ&xkraj=2&xnumnuts=2106
 # argument 2 = vysledky_melnik.csv
 
-
 import requests
 from bs4 import BeautifulSoup
 import csv
@@ -35,7 +34,6 @@ def get_municipality_name(html: BeautifulSoup) -> list:
     """Extrahuje a vrátí seznam názvů obcí z HTML tabulky pomocí třídy 'overflow_name'"""
     return [municipality.get_text() for municipality in html.find_all("td", class_="overflow_name")]
 
-
 def get_urls(html: BeautifulSoup) -> list:
     """Extrahuje a vrátí seznam URL odkazů na detailní stránky obcí z HTML tabulky volebních výsledků"""
     base_url = "https://www.volby.cz/pls/ps2017nss/"
@@ -53,7 +51,6 @@ def get_political_parties(urls: list) -> list:
         parties.append([party.text for party in html.find_all("td", class_="overflow_name")])
     return parties
 
-
 def get_voter_data(urls: list) -> tuple:
     """Extrahuje data o voličích, účasti a platných hlasech pro každou obec z jejich detailních stránek"""
     volici_v_seznamu, vydane_obalky, platne_hlasy = [], [], []
@@ -70,14 +67,12 @@ def get_voter_data(urls: list) -> tuple:
 
     return volici_v_seznamu, vydane_obalky, platne_hlasy
 
-
 def get_vote_results(urls: list) -> list:
     """Stahuje a vrací výsledky voleb pro každou stranu z daných URL"""
     return [
         [votes.text.replace('\xa0', ' ') for votes in download_html(url).find_all("td", class_="cislo", headers=["t1sa2 t1sb3"])]
         for url in urls
     ]
-
 
 def create_rows(municipality_code: list, municipality_name: list, url: list) -> list:
     """Vytváří seznam řádků pro CSV soubor obsahující kombinované informace o obcích, voličích a volebních výsledcích"""
@@ -100,8 +95,6 @@ def create_rows(municipality_code: list, municipality_name: list, url: list) -> 
         rows.append(row + results[i])
 
     return rows
-
-
 
 def save_to_csv(file_name: str, header: list, rows: list):
     """Uloží seznam dat (řádků a hlavičky) do CSV souboru s názvem 'file_name'"""
