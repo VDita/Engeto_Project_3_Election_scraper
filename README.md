@@ -5,12 +5,12 @@ Třetí projekt pro Engeto Academy
 Tento projekt slouží k získávání volebních dat z roku 2017. Odkaz výsledků voleb [zde](https://www.volby.cz/pls/ps2017nss/ps3?xjazyk=CZ). 
 
 # Instalace knihoven
-Knihovny použivé v kódu jsou uloženy v souboru `requirements.txt`. Pro instalaci je doporučeno vytvořit nové virtuální prostředí
+Knihovny použité v kódu jsou uloženy v souboru `requirements.txt`. Pro instalaci je doporučeno vytvořit nové virtuální prostředí
 a s nainstalovaným manažerem spustit následovně:
 
 ```bash
 $ pip3 --version                      # Ověří verzi manažeru
-$ pip3 install -r requirements.txt    # Naistaluje knihony
+$ pip3 install -r requirements.txt    # Nainstaluje knihovny
 ```
 
 # Spuštění projektu
@@ -21,7 +21,7 @@ Pro spuštění `projekt_3.py` jsou potřeba dva argumenty:
 Poté budou výsledky staženy do souboru `csv`.
 
 # Ukázka projektu
-Výsledky hlasování pro kres Mělník:
+Výsledky hlasování pro okres Mělník:
 1. argument: `https://www.volby.cz/pls/ps2017nss/ps32?xjazyk=CZ&xkraj=2&xnumnuts=2106`
 2. argument: `vysledky_melnik.csv`
 
