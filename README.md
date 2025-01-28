@@ -16,7 +16,7 @@ $ pip3 install -r requirements.txt    # Nainstaluje knihovny
 # Spuštění projektu
 Pro spuštění `projekt_3.py` jsou potřeba dva argumenty:
 
-`python projekt_3.py <odkaz-uzemniho_celku> <vysledny-soubor>`
+`python projekt_3.py <link_district> <final_file>`
 
 Poté budou výsledky staženy do souboru `csv`.
 
