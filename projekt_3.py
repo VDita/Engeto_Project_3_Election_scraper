@@ -46,14 +46,19 @@ def get_municipality_code(html: BeautifulSoup) -> list:
 def get_political_parties(urls: list) -> list:
     """Extrahuje a vrátí seznam politických stran pro každou obec z jejich detailních stránek"""
     parties = []
+
     for url in urls:
         html = download_html(url)
-        parties.append([party.text for party in html.find_all("td", class_="overflow_name")])
+        for party in html.find_all("td", class_="overflow_name"):
+            party_name = party.text.strip()
+            if party_name not in parties:
+                parties.append(party_name)
+
     return parties
 
 def get_voter_data(urls: list) -> tuple:
     """Extrahuje data o voličích, účasti a platných hlasech pro každou obec z jejich detailních stránek"""
-    volici_v_seznamu, vydane_obalky, platne_hlasy = [], [], []
+    registered_voters, envelopes, valid_votes = [], [], []
 
     def extract_data(html: BeautifulSoup, header_id: str) -> list:
         """Získá data z HTML podle daného header_id (např. počet voličů, vydané obálky)"""
@@ -61,37 +66,34 @@ def get_voter_data(urls: list) -> tuple:
 
     for url in urls:
         html = download_html(url)
-        volici_v_seznamu.extend(extract_data(html, 'sa2'))
-        vydane_obalky.extend(extract_data(html, 'sa3'))
-        platne_hlasy.extend(extract_data(html, 'sa6'))
+        registered_voters.extend(extract_data(html, 'sa2'))
+        envelopes.extend(extract_data(html, 'sa3'))
+        valid_votes.extend(extract_data(html, 'sa6'))
 
-    return volici_v_seznamu, vydane_obalky, platne_hlasy
+    return registered_voters, envelopes, valid_votes
 
 def get_vote_results(urls: list) -> list:
     """Stahuje a vrací výsledky voleb pro každou stranu z daných URL"""
     return [
-        [votes.text.replace('\xa0', ' ') for votes in download_html(url).find_all("td", class_="cislo", headers=["t1sa2 t1sb3"])]
+        [votes.text.replace('\xa0', ' ') for votes in download_html(url).find_all("td", class_="cislo",
+                                                                                  headers=["t1sa2 t1sb3", "t2sa2 t2sb3"])]
         for url in urls
     ]
 
 def create_rows(municipality_code: list, municipality_name: list, url: list) -> list:
     """Vytváří seznam řádků pro CSV soubor obsahující kombinované informace o obcích, voličích a volebních výsledcích"""
 
-    # Získání dat o voličích, účasti a platných hlasech pro všechny obce
-    volici_v_seznamu, vydane_obalky, platne_hlasy = get_voter_data(url)
+    registered_voters, envelopes, valid_votes = get_voter_data(url)
 
-    # Získání výsledků pro každou obec
     results = get_vote_results(url)
 
     # Zajištění, že všechny seznamy mají stejnou délku
-    min_len = min(len(municipality_code), len(municipality_name), len(volici_v_seznamu), len(vydane_obalky),
-                  len(platne_hlasy), len(results))
+    min_len = min(len(municipality_code), len(municipality_name), len(registered_voters), len(envelopes),
+                  len(valid_votes), len(results))
 
-    # Příprava řádků pro CSV
     rows = []
     for i in range(min_len):
-        row = [municipality_code[i], municipality_name[i], volici_v_seznamu[i], vydane_obalky[i], platne_hlasy[i]]
-        # Přidání výsledků jednotlivých stran k řádku
+        row = [municipality_code[i], municipality_name[i], registered_voters[i], envelopes[i], valid_votes[i]]
         rows.append(row + results[i])
 
     return rows
@@ -100,7 +102,7 @@ def save_to_csv(file_name: str, header: list, rows: list):
     """Uloží seznam dat (řádků a hlavičky) do CSV souboru s názvem 'file_name'"""
     try:
         with open(file_name, mode="w", newline="", encoding="utf-8-sig") as file:
-            writer = csv.writer(file, delimiter=";")
+            writer = csv.writer(file, delimiter=",")
             writer.writerow(header)
             writer.writerows(rows)
         print(f"UKLÁDÁM DATA DO SOUBORU: {file_name}")
@@ -111,19 +113,17 @@ def save_to_csv(file_name: str, header: list, rows: list):
 def main():
     """Hlavní funkce programu"""
     # Kontrola správnosti zadaných argumentů
-    if len(sys.argv) != 3:
-        print("CHYBNĚ ZADANÉ ARGUMENTY.\nARGUMENTY ZADEJ VE FORMÁTU: projekt_3.py <odkaz-uzemniho-celku> <vyledny-soubor>")
+        if len(sys.argv) != 3:
+        print("CHYBNĚ ZADANÉ ARGUMENTY.\nARGUMENTY ZADEJ VE FORMÁTU: projekt_3.py <link_district> <final_file>"
         sys.exit(1)
 
-    odkaz, vysledny_soubor = sys.argv[1], sys.argv[2]
+    link_district, final_file = sys.argv[1], sys.argv[2]
 
-    # Ověření, zda první argument je platná URL
-    if not odkaz.startswith("http://") and not odkaz.startswith("https://"):
+    if not link_district.startswith("http://") and not link_district.startswith("https://"):
         print("CHYBA: První argument musí být platná URL adresa.")
         sys.exit(1)
 
-    # Ověření, zda druhý argument je platný CSV soubor
-    if not vysledny_soubor.endswith(".csv"):
+    if not final_file.endswith(".csv"):
         print("CHYBA: Druhý argument musí být název souboru s příponou .csv.")
         sys.exit(1)
 
