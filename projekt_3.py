@@ -127,7 +127,7 @@ def main():
         print("CHYBA: Druhý argument musí být název souboru s příponou .csv.")
         sys.exit(1)
 
-    html = download_html(link_district, print_first=True)  # Pouze při prvním stažení URL
+    html = download_html(link_district, print_first=True) 
 
     municipality_name = get_municipality_name(html)
     url = get_urls(html)
@@ -137,7 +137,7 @@ def main():
 
     rows = create_rows(municipality_code, municipality_name, url)
 
-    header = ["Kód obce", "Název obce", "Voliči v seznamu", "Vydané obálky", "Platné hlasy"] + [party for sublist in parties for party in sublist]
+    header = ["Kód obce", "Název obce", "Voliči v seznamu", "Vydané obálky", "Platné hlasy"] + parties
 
     save_to_csv(final_file, header, rows)
 
