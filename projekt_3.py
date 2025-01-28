@@ -113,8 +113,8 @@ def save_to_csv(file_name: str, header: list, rows: list):
 def main():
     """Hlavní funkce programu"""
     # Kontrola správnosti zadaných argumentů
-        if len(sys.argv) != 3:
-        print("CHYBNĚ ZADANÉ ARGUMENTY.\nARGUMENTY ZADEJ VE FORMÁTU: projekt_3.py <link_district> <final_file>"
+    if len(sys.argv) != 3:
+        print("CHYBNĚ ZADANÉ ARGUMENTY.\nARGUMENTY ZADEJ VE FORMÁTU: projekt_3.py <link_district> <final_file>")
         sys.exit(1)
 
     link_district, final_file = sys.argv[1], sys.argv[2]
@@ -127,7 +127,7 @@ def main():
         print("CHYBA: Druhý argument musí být název souboru s příponou .csv.")
         sys.exit(1)
 
-    html = download_html(odkaz, print_first=True)  # Pouze při prvním stažení URL
+    html = download_html(link_district, print_first=True)  # Pouze při prvním stažení URL
 
     municipality_name = get_municipality_name(html)
     url = get_urls(html)
@@ -139,7 +139,7 @@ def main():
 
     header = ["Kód obce", "Název obce", "Voliči v seznamu", "Vydané obálky", "Platné hlasy"] + [party for sublist in parties for party in sublist]
 
-    save_to_csv(vysledny_soubor, header, rows)
+    save_to_csv(final_file, header, rows)
 
     print(F"UKONČUJI {sys.argv[0]}")
 
